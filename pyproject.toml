@@ -21,6 +21,8 @@ test_sources = [
     "tests",
 ]
 
+icon = "icons/icon"
+
 requires = [
     "pymysql"
 ]
