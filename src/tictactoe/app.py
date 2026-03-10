@@ -1,6 +1,14 @@
 """
 Tic Tac Toe versus QBot
 """
+import locale
+original_setlocale = locale.setlocale
+def safe_setlocale(category, locale_str):
+    try:
+        return original_setlocale(category, locale_str)
+    except locale.Error:
+        pass  # Ignore unsupported locale
+locale.setlocale = safe_setlocale
 import toga
 import json
 import os
@@ -121,7 +129,6 @@ class TicTacToe(toga.App):
             # Persist only host/user/db; do NOT persist the password
             save_defaults(PATH, {'host': HOST, 'port': PORT, 'user': USER, 'pwd': PWD, 'db': DB, 'table': TABLE})
             save_defaults_local({'path': PATH})
-            cred_window.close()
 
             # Klassen erstellen und gegenseitig verlinken
             board = Board()
@@ -149,9 +156,7 @@ class TicTacToe(toga.App):
             status_display_box.add(status_display.status_box)
             status_display_box.add(toga.Box(style=Pack(flex=1)))
             container.add(status_display_box)
-            self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = container
-            self.main_window.show()
 
         def local_confirm(widget): # Local play button pressed
             PATH = path_input.value or defaults_local['path']
@@ -159,7 +164,6 @@ class TicTacToe(toga.App):
 
             # Persist the entered config path so next startup uses it
             save_defaults_local({'path': PATH, 'file': FILE})
-            cred_window.close()
 
             # Klassen erstellen und gegenseitig verlinken
             board = Board()
@@ -197,10 +201,8 @@ class TicTacToe(toga.App):
             v_box.add(status_display_box)
             self.main_window = toga.MainWindow(title=self.formal_name)
             self.main_window.content = v_box
-            self.main_window.show()
             
         def on_cancel(widget): # Cancel button pressed (SQL login cancelled)
-            cred_window.close()
             self.exit()
 
         row_path_label = toga.Label('Config Path:')
@@ -237,10 +239,8 @@ class TicTacToe(toga.App):
 
         # Ensure the application has a main_window object before showing other windows
         self.main_window = toga.MainWindow(title=self.formal_name)
-
-        cred_window = toga.Window(self, title='Spielmodus wählen')
-        cred_window.content = cred_box
-        cred_window.show()
+        self.main_window.content = cred_box
+        self.main_window.show()
 
 
 def main():
