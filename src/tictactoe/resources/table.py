@@ -20,11 +20,9 @@ class SQLTable:
                 password=self.pwd,
                 database=self.database
             )
-            print("Database connection established.")
             if not self.show_tables().__contains__(self.table):
                 self.create_matchboxes()
         except pymysql.MySQLError as e:
-            print(f"Error connecting to database: {e}")
             self.connection = None
     
     def __del__(self):
