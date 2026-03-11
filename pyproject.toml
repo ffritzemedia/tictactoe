@@ -3,10 +3,10 @@
 project_name = "TicTacToe"
 bundle = "de.ffritze.tictactoe"
 version = "0.0.1"
-url = "https://tictactoe.ffritze.de/tictactoe"
+url = "https://ffritze.de/tictactoe"
 license.file = "LICENSE"
 author = "Lutz Fischer"
-author_email = "lutz@ffritze.de"
+author_email = "media@ffritze.de"
 
 [tool.briefcase.app.tictactoe]
 formal_name = "TicTacToe"
