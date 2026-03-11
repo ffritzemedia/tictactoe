@@ -63,7 +63,9 @@ class TicTacToe(toga.App):
                 'path': str(home_docs / 'tictactoe'),
                 'file': 'menace.json',
             }
-            full_path = prog_dir / 'local_conf.json'
+            config_dir = Path(defaults['path'])
+            config_dir.mkdir(parents=True, exist_ok=True)
+            full_path = config_dir / 'local_conf.json'
             try:
                 if full_path.exists():
                     with full_path.open('r', encoding='utf-8') as f:
@@ -75,30 +77,31 @@ class TicTacToe(toga.App):
             return defaults
         
         def save_defaults(path, values: dict):
-            config_path = Path(path) / 'sql_login.json'
-            if not config_path.exists():
-                try:
-                     # ensure the folder in Documents exists so we can store the config there
-                    config_path.mkdir(parents=True, exist_ok=True)
-                except Exception:
-                    pass
+            config_dir = Path(path)
+            config_dir.mkdir(parents=True, exist_ok=True)  # Ordner anlegen
+            config_path = config_dir / 'sql_login.json'
             try:
                 with config_path.open('w', encoding='utf-8') as f:
                     json.dump(values, f, indent=2)
+                # chmod nur dort, wo sinnvoll
                 try:
-                    os.chmod(config_path, 0o600)
+                    if os.name != 'nt':  # nicht unter Windows
+                        os.chmod(config_path, 0o600)
                 except Exception:
                     pass
             except Exception:
                 pass
             
         def save_defaults_local(values: dict):
-            config_path = prog_dir / 'local_conf.json'
+            config_dir = Path(values.get('path', home_docs / 'tictactoe'))
+            config_dir.mkdir(parents=True, exist_ok=True)
+            config_path = config_dir / 'local_conf.json'
             try:
                 with config_path.open('w', encoding='utf-8') as f:
                     json.dump(values, f, indent=2)
                 try:
-                    os.chmod(config_path, 0o600)
+                    if os.name != 'nt':
+                        os.chmod(config_path, 0o600)
                 except Exception:
                     pass
             except Exception:
@@ -221,7 +224,10 @@ class TicTacToe(toga.App):
         btn_ok = toga.Button('sql', on_press=sql_confirm) # SQL login confirmed
         btn_local = toga.Button('local', on_press=local_confirm) # Local play confirmed
         btn_cancel = toga.Button('quit', on_press=on_cancel) # SQL login cancelled
-        btn_row = toga.Box(children=[btn_ok, btn_local, btn_cancel], style=Pack(direction=ROW)) # Buttons row SQL login
+        btn_row = toga.Box(
+            children=[btn_ok, btn_local, btn_cancel],
+            style=Pack(direction=ROW, padding_top=10, spacing=8)
+        )
 
         cred_box = toga.Box(children=[row_path_label, 
                                       row_path, 
