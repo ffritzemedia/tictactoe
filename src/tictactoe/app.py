@@ -4,19 +4,19 @@ Tic Tac Toe versus QBot
 
 # iOS: Locale früh absichern (einige Locales wie C.UTF-8 sind auf iOS nicht verfügbar)
 import sys, os, locale
+original_setlocale = locale.setlocale
+def safe_setlocale(category, locale_str):
+    try:
+        return original_setlocale(category, locale_str)
+    except locale.Error:
+        pass # Fehler ignorieren, damit App nicht crasht
 IS_IOS = (sys.platform == "ios")
 if IS_IOS:
     for var in ("LC_ALL", "LC_CTYPE", "LANG"):
         val = os.environ.get(var, "")
         if val.upper().startswith("C.UTF-8") or val in ("", "C.UTF8"):
             os.environ.pop(var, None)
-    try:
-        locale.setlocale(locale.LC_ALL, "")
-    except locale.Error:
-        try:
-            locale.setlocale(locale.LC_ALL, "C")
-        except locale.Error:
-            pass
+    locale.setlocale = safe_setlocale
 
 import json
 from pathlib import Path
