@@ -144,9 +144,25 @@ class TicTacToe(toga.App):
 
             defaults = self._load_sql_defaults(defaults_local)
 
+            def on_path_confirm(widget):
+                nonlocal defaults, defaults_local
+                new_path = path_input.value or defaults_local["path"]
+                if not Path(new_path).exists():
+                    new_path = str(self.app_data_dir())
+                defaults_local["path"] = new_path
+                path_input.value = new_path
+
+                defaults = self._load_sql_defaults(defaults_local)
+                host_input.placeholder = defaults["host"]
+                port_input.placeholder = defaults["port"]
+                user_input.placeholder = defaults["user"]
+                pwd_input.placeholder = defaults["pwd"]
+                db_input.placeholder = defaults["db"]
+                table_input.placeholder = defaults["table"]
+
             # Eingabefelder
             print("building inputs")
-            path_input = toga.TextInput(style=Pack(flex=1), placeholder=defaults_local["path"])
+            path_input = toga.TextInput(style=Pack(flex=1), placeholder=defaults_local["path"], on_confirm=on_path_confirm)
             host_input = toga.TextInput(style=Pack(flex=1), placeholder=defaults["host"])
             port_input = toga.TextInput(style=Pack(flex=1), placeholder=defaults["port"])
             user_input = toga.TextInput(style=Pack(flex=1), placeholder=defaults["user"])
